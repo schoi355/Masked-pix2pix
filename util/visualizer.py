@@ -138,7 +138,17 @@ class Visualizer():
                 for label, image in visuals.items():
                     image_numpy = util.tensor2im(image)
                     label_html_row += '<td>%s</td>' % label
-                    images.append(image_numpy.transpose([2, 0, 1]))
+
+                    # images.append(image_numpy.transpose([2, 0, 1]))
+                    
+                    if image_numpy.ndim == 2:
+                        # Grayscale image: (H, W) -> (1, H, W)
+                        image_numpy = np.expand_dims(image_numpy, axis=0)
+                    else:
+                        # RGB image: (H, W, C) -> (C, H, W)
+                        image_numpy = image_numpy.transpose([2, 0, 1])
+
+                    images.append(image_numpy)
                     idx += 1
                     if idx % ncols == 0:
                         label_html += '<tr>%s</tr>' % label_html_row

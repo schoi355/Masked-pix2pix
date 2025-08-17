@@ -2,9 +2,10 @@ import os
 from data.base_dataset import BaseDataset, get_params, get_transform
 from data.image_folder import make_dataset
 from PIL import Image
+import torch
 
 
-class AlignedDataset(BaseDataset):
+class AlignedMaskDataset(BaseDataset):
     """A dataset class for paired image dataset.
 
     It assumes that the directory '/path/to/data/train' contains image pairs in the form of {A,B}.
@@ -47,8 +48,8 @@ class AlignedDataset(BaseDataset):
 
         # apply the same transform to both A and B
         transform_params = get_params(self.opt, A.size)
-        A_transform = get_transform(self.opt, transform_params, grayscale=(self.input_nc == 1))
-        B_transform = get_transform(self.opt, transform_params, grayscale=(self.output_nc == 1))
+        A_transform = get_transform(self.opt, transform_params, grayscale=(self.input_nc < 3))
+        B_transform = get_transform(self.opt, transform_params, grayscale=(self.output_nc < 3))
 
         A = A_transform(A)
         B = B_transform(B)
@@ -58,7 +59,10 @@ class AlignedDataset(BaseDataset):
         mask_transform = get_transform(self.opt, transform_params, grayscale=True)
         mask = mask_transform(mask)
 
-        return {'A': A, 'B': B, 'A_paths': AB_path, 'B_paths': AB_path, 'mask': mask, 'mask_path': mask_path}
+        A_with_mask = torch.cat((A, mask), dim=0)
+        B_with_mask = torch.cat((B, mask), dim=0)
+
+        return {'A': A, 'B': B_with_mask, 'A_paths': AB_path, 'B_paths': AB_path, 'mask': mask, 'mask_path': mask_path}
 
     def __len__(self):
         """Return the total number of images in the dataset."""

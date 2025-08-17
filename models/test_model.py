@@ -1,6 +1,8 @@
 from .base_model import BaseModel
 from . import networks
-
+import torch
+import numpy as np
+import cv2
 
 class TestModel(BaseModel):
     """ This TesteModel can be used to generate CycleGAN results for only one direction.
@@ -60,9 +62,17 @@ class TestModel(BaseModel):
         self.real = input['A'].to(self.device)
         self.image_paths = input['A_paths']
 
+        # self.mask = input['mask'].to(self.device)  
+        # self.mask_paths = input['mask_path']     
+
     def forward(self):
         """Run forward pass."""
         self.fake = self.netG(self.real)  # G(real)
+        # input_with_mask = torch.cat([self.real, self.mask], dim=1)
+        # self.fake = self.netG(input_with_mask)
+        
+        # print(f"[INFO] Input shape: {self.real.shape}")
+        # print(f"[INFO] Output shape: {self.fake.shape}")
 
     def optimize_parameters(self):
         """No optimization for test model."""

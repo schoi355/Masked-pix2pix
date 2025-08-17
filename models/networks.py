@@ -3,6 +3,7 @@ import torch.nn as nn
 from torch.nn import init
 import functools
 from torch.optim import lr_scheduler
+from . import attention
 
 
 ###############################################################################
@@ -488,6 +489,7 @@ class UnetSkipConnectionBlock(nn.Module):
         """
         super(UnetSkipConnectionBlock, self).__init__()
         self.outermost = outermost
+        self.innermost = innermost
         if type(norm_layer) == functools.partial:
             use_bias = norm_layer.func == nn.InstanceNorm2d
         else:
@@ -501,6 +503,11 @@ class UnetSkipConnectionBlock(nn.Module):
         uprelu = nn.ReLU(True)
         upnorm = norm_layer(outer_nc)
 
+        # if not outermost and not innermost:
+        #     self.attention = attention.AttentionGate(F_g=512, F_l=512, F_int=256)
+        # else:
+        #     self.attention = None
+
         if outermost:
             upconv = nn.ConvTranspose2d(inner_nc * 2, outer_nc,
                                         kernel_size=4, stride=2,
@@ -508,6 +515,7 @@ class UnetSkipConnectionBlock(nn.Module):
             down = [downconv]
             up = [uprelu, upconv, nn.Tanh()]
             model = down + [submodule] + up
+            self.attention = None
         elif innermost:
             upconv = nn.ConvTranspose2d(inner_nc, outer_nc,
                                         kernel_size=4, stride=2,
@@ -515,6 +523,7 @@ class UnetSkipConnectionBlock(nn.Module):
             down = [downrelu, downconv]
             up = [uprelu, upconv, upnorm]
             model = down + up
+            self.attention = None
         else:
             upconv = nn.ConvTranspose2d(inner_nc * 2, outer_nc,
                                         kernel_size=4, stride=2,
@@ -526,14 +535,43 @@ class UnetSkipConnectionBlock(nn.Module):
                 model = down + [submodule] + up + [nn.Dropout(0.5)]
             else:
                 model = down + [submodule] + up
+            # self.attention = attention.AttentionGate(F_g=outer_nc, F_l=outer_nc, F_int=outer_nc // 2)
+            self.attention = None
 
         self.model = nn.Sequential(*model)
+
+    # def forward(self, x):
+    #     if self.outermost:
+    #         return self.model(x)
+    #     else:   # add skip connections
+    #         return torch.cat([x, self.model(x)], 1)
+
+    # def forward(self, x):
+    #     out = self.model(x)
+
+    #     # outermost block returns final output — no skip connection, no crop
+    #     if self.outermost:
+    #         return out
+
+    #     # Align x to out via center crop (for skip connection)
+    #     diff_y = x.size(2) - out.size(2)
+    #     diff_x = x.size(3) - out.size(3)
+
+    #     if diff_y != 0 or diff_x != 0:
+    #         x = x[:, :, diff_y // 2 : x.size(2) - (diff_y - diff_y // 2),
+    #                 diff_x // 2 : x.size(3) - (diff_x - diff_x // 2)]
+
+    #     return torch.cat([x, out], 1)
 
     def forward(self, x):
         if self.outermost:
             return self.model(x)
-        else:   # add skip connections
-            return torch.cat([x, self.model(x)], 1)
+        else:
+            skip = x
+            x = self.model(x)
+            if self.attention:
+                skip = self.attention(x, skip)
+            return torch.cat([skip, x], 1)
 
 
 class NLayerDiscriminator(nn.Module):

@@ -125,12 +125,28 @@ class BaseModel(ABC):
         lr = self.optimizers[0].param_groups[0]['lr']
         print('learning rate %.7f -> %.7f' % (old_lr, lr))
 
+    # def get_current_visuals(self):
+    #     """Return visualization images. train.py will display these images with visdom, and save the images to a HTML"""
+    #     visual_ret = OrderedDict()
+    #     for name in self.visual_names:
+    #         if isinstance(name, str):
+    #             visual_ret[name] = getattr(self, name)
+    #     return visual_ret
+
     def get_current_visuals(self):
-        """Return visualization images. train.py will display these images with visdom, and save the images to a HTML"""
         visual_ret = OrderedDict()
         for name in self.visual_names:
             if isinstance(name, str):
-                visual_ret[name] = getattr(self, name)
+                image_tensor = getattr(self, name)
+                # Only visualize the first image in the batch
+                image = image_tensor[0].detach().cpu()
+                # Convert grayscale (1 channel) to 3-channel
+                if image.shape[0] == 1:
+                    image = image.repeat(1, 1, 1)
+                # Limit extra channels to 3 (e.g., if input is 4-channel)
+                elif image.shape[0] > 1:
+                    image = image[:2]
+                visual_ret[name] = image
         return visual_ret
 
     def get_current_losses(self):
