@@ -8,10 +8,16 @@ This model is specifically developed to remove thermal reflections on passive in
 
 ## Installation
 
+For Conda users, you can create a new Conda environment by
+
 ```
 git clone https://github.com/schoi355/Masked-pix2pix.git
 cd Masked-pix2pix
-pip install -r requirements.txt
+conda env create -f environment.yml
+```
+and then activate the environment by
+```
+conda activate pytorch-img2img
 ```
 
 ## Usage
