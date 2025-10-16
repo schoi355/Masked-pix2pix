@@ -21,8 +21,20 @@ conda activate pytorch-img2img
 ```
 
 ## Usage
-
 ### Train
+Refer to this document [TBD] to how to create the training data.
+Training dataset is organized by
+```
+datasets/train/
+├── AB/
+├── mask/
+├── original/
+└── synthesized/
+```
+where `original` means the images without reflection and `synthesized` means the images with synthesized reflection on the marker. To combine the `original` and `synthesized` images for training, use this command:
+```
+python datasets/combine_A_and_B.py --fold_A datasets/train/original --fold_B datasets/train/synthesized --fold_AB datasets/train/AB
+```
 
 ```
 python train.py --dataroot ./datasets/train/AB --name masked_pix2pix --model pix2pix --direction BtoA --preprocess resize --load_size 512 --crop_size 512 --batch_size 1 --dataset_mode alignedmask --input_nc 2 --output_nc 1 --norm instance --epoch EPOCH_NUM
@@ -31,7 +43,7 @@ python train.py --dataroot ./datasets/train/AB --name masked_pix2pix --model pix
 ### Test
 
 ```
-python test.py --dataroot $DATASET_FOLDER --name masked_pix2pix --model test --netG unet_256 --direction BtoA --preprocess resize --load_size 512 --crop_size 512 --no_dropout --dataset_mode single --norm instance --input_nc 1 --output_nc 1
+python test.py --dataroot $TEST_DATASET_FOLDER --name masked_pix2pix --model test --netG unet_256 --direction BtoA --preprocess resize --load_size 512 --crop_size 512 --no_dropout --dataset_mode single --norm instance --input_nc 1 --output_nc 1
 ```
 
 # Dataset
