@@ -66,9 +66,30 @@ Notes:
 - output_nc 1 indicates the output is a single-channel (grayscale) reflection-free image.
 
 ### Test
-
+After training is complete, you can evaluate the model on the test dataset using the following command:
 ```
-python test.py --dataroot $TEST_DATASET_FOLDER --name masked_pix2pix --model test --netG unet_256 --direction BtoA --preprocess resize --load_size 512 --crop_size 512 --no_dropout --dataset_mode single --norm instance --input_nc 1 --output_nc 1
+python test.py \
+  --dataroot $TEST_DATASET_FOLDER \
+  --name masked_pix2pix \
+  --model test \
+  --netG unet_256 \
+  --direction BtoA \
+  --preprocess resize \
+  --load_size 512 \
+  --crop_size 512 \
+  --no_dropout \
+  --dataset_mode single \
+  --norm instance \
+  --input_nc 1 \
+  --output_nc 1
+```
+Notes:
+- $TEST_DATASET_FOLDER should point to the directory containing your test images.
+- direction BtoA specifies that the model translates from reflected (B) images to reflection-free (A) outputs.
+- The generator uses a U-Net 256 architecture (--netG unet_256) consistent with the training configuration.
+- The outputs (generated images) will be saved under:
+```
+./results/masked_pix2pix/test_latest/images/
 ```
 
 # Dataset
