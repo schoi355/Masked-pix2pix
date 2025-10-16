@@ -32,7 +32,6 @@ python train.py --dataroot ./datasets/train/AB --name masked_pix2pix --model pix
 
 ```
 python test.py --dataroot $DATASET_FOLDER --name masked_pix2pix --model test --netG unet_256 --direction BtoA --preprocess resize --load_size 512 --crop_size 512 --no_dropout --dataset_mode single --norm instance --input_nc 1 --output_nc 1
-
 ```
 
 # Dataset
