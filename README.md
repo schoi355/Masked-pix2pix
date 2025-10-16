@@ -97,6 +97,9 @@ Notes:
 
 ## Experimental Dataset
 
+Temporary link for the dataset: [Box](https://uofi.box.com/s/9nsaw1jgxrk7atno4aftysvmjabnql7e)
+
+
 # Reference
 
 This repository is a fork and extension of: [junyanz/pytorch-CycleGAN-and-pix2pix](https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix)
