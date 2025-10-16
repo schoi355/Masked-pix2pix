@@ -24,6 +24,11 @@ conda activate pytorch-img2img
 
 ### Train
 
+```
+python train.py --dataroot ./datasets/train/AB --name masked_pix2pix --model pix2pix --direction BtoA --preprocess resize --load_size 512 --crop_size 512 --gpu_ids 1 --batch_size 1 --n_epochs 200 --dataset_mode alignedmask --input_nc 2 --output_nc 1 --norm instance --gpu_ids 0
+
+```
+
 ### Test
 
 # Dataset
