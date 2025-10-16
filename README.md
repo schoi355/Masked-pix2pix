@@ -85,7 +85,6 @@ python test.py \
 ```
 Notes:
 - $TEST_DATASET_FOLDER should point to the directory containing your test images.
-- direction BtoA specifies that the model translates from reflected (B) images to reflection-free (A) outputs.
 - The generator uses a U-Net 256 architecture (--netG unet_256) consistent with the training configuration.
 - The outputs (generated images) will be saved under:
 ```
