@@ -22,23 +22,48 @@ conda activate pytorch-img2img
 
 ## Usage
 ### Train
-Refer to this document [TBD] to how to create the training data.
-Training dataset is organized by
+Refer to [this document (TBD)] for detailed instructions on how to generate the training data.
+The dataset should be organized as follows:
 ```
 datasets/train/
-├── AB/
-├── mask/
-├── original/
-└── synthesized/
+├── AB/             # Combined paired images for pix2pix training
+├── mask/           # Binary masks indicating reflective regions
+├── original/       # Reflection-free (ground truth) marker images
+└── synthesized/    # Marker images with synthesized thermal reflections
 ```
-where `original` means the images without reflection and `synthesized` means the images with synthesized reflection on the marker. To combine the `original` and `synthesized` images for training, use this command:
-```
-python datasets/combine_A_and_B.py --fold_A datasets/train/original --fold_B datasets/train/synthesized --fold_AB datasets/train/AB
-```
+- original/ contains images of passive infrared fiducial markers without reflections.
+- synthesized/ contains the same markers with artificially generated thermal reflections.
+- mask/ provides binary masks specifying regions affected by reflections.
+- AB/ stores the concatenated paired images used for pix2pix-style training.
 
+To create the `AB/` folder by combining the reflection-free (`original`) and reflected (`synthesized`) images, run:
 ```
-python train.py --dataroot ./datasets/train/AB --name masked_pix2pix --model pix2pix --direction BtoA --preprocess resize --load_size 512 --crop_size 512 --batch_size 1 --dataset_mode alignedmask --input_nc 2 --output_nc 1 --norm instance --epoch EPOCH_NUM
+python datasets/combine_A_and_B.py \
+  --fold_A datasets/train/original \
+  --fold_B datasets/train/synthesized \
+  --fold_AB datasets/train/AB
 ```
+Once the dataset is prepared, start training the masked Pix2Pix model using:
+```
+python train.py \
+  --dataroot ./datasets/train/AB \
+  --name masked_pix2pix \
+  --model pix2pix \
+  --direction BtoA \
+  --preprocess resize \
+  --load_size 512 \
+  --crop_size 512 \
+  --batch_size 1 \
+  --dataset_mode alignedmask \
+  --input_nc 2 \
+  --output_nc 1 \
+  --norm instance \
+  --epoch EPOCH_NUM
+```
+Notes:
+- direction BtoA means the model learns to translate from reflected (B) images to reflection-free (A) images.
+- input_nc 2 specifies that both the input image and mask are provided as input channels.
+- output_nc 1 indicates the output is a single-channel (grayscale) reflection-free image.
 
 ### Test
 
