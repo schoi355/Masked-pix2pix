@@ -95,9 +95,9 @@ Notes:
 
 ## Training Dataset
 
-## Experimental Dataset
+## Experiment Dataset
 
-Temporary link for the dataset: [Box](https://uofi.box.com/s/9nsaw1jgxrk7atno4aftysvmjabnql7e)
+Temporary link for the rotorcraft takeoff and landing dataset: [Box](https://uofi.box.com/s/9nsaw1jgxrk7atno4aftysvmjabnql7e)
 
 
 # Reference
